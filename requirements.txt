@@ -1,4 +1,6 @@
 flask
 flask-cors
-requests
-python-dotenv
+gunicorn
+joblib
+scikit-learn
+openai
