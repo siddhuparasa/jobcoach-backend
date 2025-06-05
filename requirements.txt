@@ -1,6 +1,7 @@
-flask
+Flask
 flask-cors
 gunicorn
 joblib
 scikit-learn
-openai
+openrouter  # Assuming you're using OpenRouter's official Python SDK
+python-dotenv  # To securely load environment variables from a .env file
