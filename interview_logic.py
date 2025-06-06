@@ -1,10 +1,8 @@
 import os
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = "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"
 
 def generate_feedback(role, answer):
     prompt = f"""
@@ -29,7 +27,9 @@ Overall Score: <score out of 10>
     payload = {
         "model": "gpt-3.5-turbo",
         "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
     }
+
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     data = response.json()

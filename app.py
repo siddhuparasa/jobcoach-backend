@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from interview_logic import generate_feedback
-from dotenv import load_dotenv
+
 import os
 import traceback
 import random
 
-load_dotenv()
-print("DEBUG: Loaded OPENAI_API_KEY =", os.getenv("OPENROUTER_API_KEY"))
+
+OPENROUTER_API_KEY = "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"
+print("DEBUG: Loaded OPENROUTER_API_KEY =", OPENROUTER_API_KEY)
+
 
 app = Flask(__name__)
 CORS(app)
