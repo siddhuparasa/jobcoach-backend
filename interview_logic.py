@@ -2,7 +2,7 @@ import os
 import requests
 
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 def generate_feedback(role, answer):
     prompt = f"""
