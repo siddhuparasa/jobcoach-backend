@@ -1,20 +1,20 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from interview_logic import generate_feedback
-
+from dotenv import load_dotenv
 import os
 import traceback
-import random
 
+# Load environment variables from .env file
+load_dotenv()
 
-OPENROUTER_API_KEY = "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"
-print("DEBUG: Loaded OPENROUTER_API_KEY =", OPENROUTER_API_KEY)
-
+# Read your API key from environment
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+print("Loaded API key:", OPENROUTER_API_KEY)  # Remove or comment out in production
 
 app = Flask(__name__)
 CORS(app)
 
-# Predefined large question banks (40-50 medium-hard questions per role)
 QUESTION_BANK = {
     "DSA": [
         "Explain how quicksort works and its average time complexity.",
@@ -353,14 +353,16 @@ QUESTION_BANK = {
     ]
 }
 
-# For simplicity, track user's current question index by a client-sent session id (can be improved with a real DB)
-user_progress = {}  # Example: {session_id: {role: index}}
+user_progress = {}
 
 @app.route('/get_question', methods=['POST'])
 def get_question():
     data = request.get_json()
     role = data.get('role')
     session_id = data.get('session_id')
+
+    if not role or not session_id:
+        return jsonify({"error": "Missing 'role' or 'session_id'"}), 400
 
     if role not in QUESTION_BANK:
         return jsonify({"question": "No questions available for this role."})
@@ -383,12 +385,15 @@ def try_again():
     role = data.get('role')
     session_id = data.get('session_id')
 
-    # Return the current question again (don’t increment index)
+    if not role or not session_id:
+        return jsonify({"error": "Missing 'role' or 'session_id'"}), 400
+
     if session_id in user_progress and role in user_progress[session_id]:
         idx = user_progress[session_id][role]
         question = QUESTION_BANK[role][idx]
         return jsonify({"question": question})
-    # return jsonify({"question": "No active question found, please request a new question."})
+
+    return jsonify({"question": "No active question found, please request a new question."}), 404
 
 @app.route('/next_question', methods=['POST'])
 def next_question():
@@ -396,10 +401,13 @@ def next_question():
     role = data.get('role')
     session_id = data.get('session_id')
 
+    if not role or not session_id:
+        return jsonify({"error": "Missing 'role' or 'session_id'"}), 400
+
     if session_id not in user_progress:
         user_progress[session_id] = {}
 
-    idx = user_progress[session_id].get(role, 0) + 1  # move to next question
+    idx = user_progress[session_id].get(role, 0) + 1
     questions = QUESTION_BANK.get(role, [])
 
     if idx >= len(questions):
@@ -424,7 +432,7 @@ def ask():
     except Exception as e:
         print("ERROR in /ask:")
         traceback.print_exc()
-        return jsonify({'feedback': 'An error occurred. Please try again.'})
+        return jsonify({'feedback': 'An error occurred. Please try again.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

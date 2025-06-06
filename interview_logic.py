@@ -1,8 +1,13 @@
 import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if not OPENROUTER_API_KEY:
+    raise ValueError("OPENROUTER_API_KEY is not set in the environment variables.")
 
 def generate_feedback(role, answer):
     prompt = f"""
